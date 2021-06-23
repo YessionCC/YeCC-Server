@@ -1,0 +1,1 @@
+/usr/bin/c++  -Wall -std=c++11  -rdynamic CMakeFiles/test_config.dir/test/test_config.cpp.o  -o ../bin/test_config  -Wl,-rpath,/home/yession/Code/Cpp/Server/lib ../lib/libyecc.so /usr/local/lib/libyaml-cpp.a 
