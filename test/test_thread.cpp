@@ -12,9 +12,7 @@ void func1() {
   YECC_LOG_DEBUG(YECC_ROOT_LOG)<<"name: "<<yecc::Thread::GetName()
     <<" this.name: "<<yecc::Thread::GetThis()->getName()
     <<" id: "<<yecc::Thread::GetThis()->getID();
-  while(true) {
-    YECC_LOG_DEBUG(logger)<<"123465789abcdefghijklmnopqrst";
-  }
+  YECC_LOG_DEBUG(logger)<<"123465789abcdefghijklmnopqrst";
 }
 
 void* func2(void*) {
@@ -25,6 +23,11 @@ void test() {
   YAML::Node root = YAML::LoadFile("../bin/config/log.yml");
   yecc::Config::LoadFromYaml(root);
   YECC_LOG_DEBUG(YECC_ROOT_LOG)<<logger->ToYamlStr();
+  yecc::Config::Visit(
+    [](yecc::ConfigVarBase::ptr p){
+      YECC_LOG_DEBUG(YECC_ROOT_LOG)<<132;
+      YECC_LOG_DEBUG(YECC_ROOT_LOG)<<p->toString();
+  });
   yecc::Thread::ptr thr(new yecc::Thread(func1, "123"));
   yecc::Thread::ptr thr1(new yecc::Thread(func1, "456"));
   yecc::Thread::ptr thr2(new yecc::Thread(func1, "789"));

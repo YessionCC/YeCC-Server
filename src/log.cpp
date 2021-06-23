@@ -578,7 +578,7 @@ namespace yecc {
 
   struct LogIniter {
     LogIniter(){
-      logs_define->addListener(0xFF1234, [](
+      logs_define->addListener([](
         const std::set<LogDefine>& old,
         const std::set<LogDefine>& _new){
           for(auto& v: _new) {

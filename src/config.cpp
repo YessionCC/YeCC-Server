@@ -3,8 +3,6 @@
 
 namespace yecc {
 
-  Config::ConfigVarMap Config::s_data;
-
   static void ListAllMember(// normal static func can only call in current file
     const std::string& prefix, 
     const YAML::Node& node,
@@ -43,6 +41,14 @@ namespace yecc {
           var->fromString(ss.str());
         }
       }
+    }
+  }
+
+  void Config::Visit(std::function<void(ConfigVarBase::ptr)> cb) {
+    RWMutexType::ReadLock lock(GetMutex());
+    auto& data = GetDatas();
+    for(auto& p: data) {
+      cb(p.second);
     }
   }
 

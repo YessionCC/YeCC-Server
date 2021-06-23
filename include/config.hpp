@@ -14,6 +14,7 @@
 #include"log.hpp"
 #include"boost/lexical_cast.hpp"
 #include"yaml-cpp/yaml.h"
+#include"thread.hpp"
 
 namespace yecc {
 
@@ -230,6 +231,7 @@ namespace yecc {
   >
   class ConfigVar : public ConfigVarBase { //Convert base data type
     public:
+      typedef RWMutex RWMutexType;
       typedef std::shared_ptr<ConfigVar> ptr;
       typedef std::function<void(const T& old_val, const T& new_val)> on_change_cb;
       ConfigVar(
@@ -240,6 +242,7 @@ namespace yecc {
 
       std::string toString() override {
         try {
+          RWMutexType::ReadLock lock(m_mutex);
           return ToStr()(m_val); //boost::lexical_cast<std::string>(m_val);
         } catch(std::exception& e) {
           YECC_LOG_ERROR(YECC_ROOT_LOG) 
@@ -263,31 +266,45 @@ namespace yecc {
         return false;
       }
 
-      const T getValue() const { return m_val; }
+      const T getValue() const { 
+        RWMutexType::ReadLock lock(m_mutex);
+        return m_val; 
+      }
       void setValue(const T& v) { 
-        if(m_val == v) return;
-        for(auto& p: m_cbs) {
-          p.second(m_val, v);
+        {
+          RWMutexType::ReadLock lock(m_mutex);
+          if(m_val == v) return;
+          for(auto& p: m_cbs) {
+            p.second(m_val, v);
+          }
         }
+        RWMutexType::WriteLock lock(m_mutex);
         m_val = v; 
       } 
       std::string getTypeName() const override { return typeid(T).name(); }
 
-      void addListener(uint64_t key, on_change_cb cb) {
+      uint64_t addListener(on_change_cb cb) {//return key
+        static uint64_t key = 0;
+        RWMutexType::WriteLock lock(m_mutex);
         m_cbs[key] = cb;
+        return key++;
       }
       void delListener(uint64_t key) {
+        RWMutexType::WriteLock lock(m_mutex);
         m_cbs.erase(key);
       }
       void clearListener() {
+        RWMutexType::WriteLock lock(m_mutex);
         m_cbs.clear();
       }
       on_change_cb getListener(uint64_t key) {
+        RWMutexType::ReadLock lock(m_mutex);
         auto it = m_cbs.find(key);
         if(it == m_cbs.end()) return nullptr;
         else return it->second;
       }
     private:
+      RWMutexType m_mutex;
       T m_val;
 
       std::map<uint64_t, on_change_cb> m_cbs;
@@ -296,14 +313,17 @@ namespace yecc {
   class Config {
     public:
       typedef std::map<std::string, ConfigVarBase::ptr> ConfigVarMap;
+      typedef RWMutex RWMutexType;
 
       template<class T>
       static typename ConfigVar<T>::ptr Lookup( //create
         const std::string& name, 
         const T& default_val,
         const std::string& desp = "") {
-          auto it = s_data.find(name);
-          if(it != s_data.end()) {
+          RWMutexType::WriteLock lock(GetMutex());
+          auto& data = GetDatas();
+          auto it = data.find(name);
+          if(it != data.end()) {
             auto tmp = std::dynamic_pointer_cast<ConfigVar<T> > (it->second);
             if(tmp) {
               YECC_LOG_INFO(YECC_ROOT_LOG)<<"Lookup name = "<<name<<" exists";
@@ -324,25 +344,41 @@ namespace yecc {
               throw std::invalid_argument(name);
           }
           typename ConfigVar<T>::ptr v(new ConfigVar<T>(name, default_val, desp));
-          s_data[name] = v;
+          data[name] = v;
           return v;
       }
 
       template<class T>
       static typename ConfigVar<T>::ptr Lookup(const std::string& name) { //find
-        return s_data.count(name)? 
-          std::dynamic_pointer_cast<ConfigVar<T> > (s_data[name]) : nullptr;
+        RWMutexType::ReadLock lock(GetMutex());
+        auto& data = GetDatas();
+        auto it = data.find(name);
+        if(it == data.end()) return nullptr;
+        else return std::dynamic_pointer_cast<ConfigVar<T> > (data[name]);
         //Note that parent class to child class must dynamic_pointer_cast
       }
 
       static ConfigVarBase::ptr LookupBase(const std::string& name) {
-        return s_data.count(name)? s_data[name] : nullptr;
+        RWMutexType::ReadLock lock(GetMutex());
+        auto& data = GetDatas();
+        auto it = data.find(name);
+        if(it == data.end()) return nullptr;
+        else return data[name];
       }
 
       static void LoadFromYaml(const YAML::Node& root);
+      static void Visit(std::function<void(ConfigVarBase::ptr)> cb);
 
     private:
-      static ConfigVarMap s_data;
+      static ConfigVarMap& GetDatas() {
+        //to avoid static member init sequence causing vars not init
+        static ConfigVarMap s_data;
+        return s_data;
+      }
+      static RWMutexType& GetMutex() {
+        static RWMutexType m_mutex;
+        return m_mutex;
+      }
   };
 
 }

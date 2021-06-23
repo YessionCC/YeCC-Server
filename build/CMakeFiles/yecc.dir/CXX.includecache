@@ -35,6 +35,8 @@ boost/lexical_cast.hpp
 ../include/boost/lexical_cast.hpp
 yaml-cpp/yaml.h
 ../include/yaml-cpp/yaml.h
+thread.hpp
+../include/thread.hpp
 
 ../include/log.hpp
 map
