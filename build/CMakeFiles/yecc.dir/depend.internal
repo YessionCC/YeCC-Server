@@ -1206,5 +1206,8 @@ CMakeFiles/yecc.dir/src/thread.cpp.o
  ../include/util.hpp
  /home/yession/Code/Cpp/Server/src/thread.cpp
 CMakeFiles/yecc.dir/src/util.cpp.o
+ ../include/log.hpp
+ ../include/singleton.hpp
+ ../include/thread.hpp
  ../include/util.hpp
  /home/yession/Code/Cpp/Server/src/util.cpp

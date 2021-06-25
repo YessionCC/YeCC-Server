@@ -17,7 +17,7 @@ find_library(YAMLCPP libyaml-cpp.a)
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin) 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib) 
 
-set(EXE_FILE test_thread)
+set(EXE_FILE test_log)
 
 add_executable(${EXE_FILE} ${PROJECT_SOURCE_DIR}/test/${EXE_FILE}.cpp)
 add_dependencies(${EXE_FILE} yecc)

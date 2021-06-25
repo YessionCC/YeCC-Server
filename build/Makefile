@@ -111,17 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named test_thread
+# Target rules for targets named test_log
 
 # Build rule for target.
-test_thread: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test_thread
-.PHONY : test_thread
+test_log: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 test_log
+.PHONY : test_log
 
 # fast build rule for target.
-test_thread/fast:
-	$(MAKE) -f CMakeFiles/test_thread.dir/build.make CMakeFiles/test_thread.dir/build
-.PHONY : test_thread/fast
+test_log/fast:
+	$(MAKE) -f CMakeFiles/test_log.dir/build.make CMakeFiles/test_log.dir/build
+.PHONY : test_log/fast
 
 #=============================================================================
 # Target rules for targets named yecc
@@ -244,32 +244,32 @@ src/util.cpp.s:
 	$(MAKE) -f CMakeFiles/yecc.dir/build.make CMakeFiles/yecc.dir/src/util.cpp.s
 .PHONY : src/util.cpp.s
 
-test/test_thread.o: test/test_thread.cpp.o
+test/test_log.o: test/test_log.cpp.o
 
-.PHONY : test/test_thread.o
+.PHONY : test/test_log.o
 
 # target to build an object file
-test/test_thread.cpp.o:
-	$(MAKE) -f CMakeFiles/test_thread.dir/build.make CMakeFiles/test_thread.dir/test/test_thread.cpp.o
-.PHONY : test/test_thread.cpp.o
+test/test_log.cpp.o:
+	$(MAKE) -f CMakeFiles/test_log.dir/build.make CMakeFiles/test_log.dir/test/test_log.cpp.o
+.PHONY : test/test_log.cpp.o
 
-test/test_thread.i: test/test_thread.cpp.i
+test/test_log.i: test/test_log.cpp.i
 
-.PHONY : test/test_thread.i
+.PHONY : test/test_log.i
 
 # target to preprocess a source file
-test/test_thread.cpp.i:
-	$(MAKE) -f CMakeFiles/test_thread.dir/build.make CMakeFiles/test_thread.dir/test/test_thread.cpp.i
-.PHONY : test/test_thread.cpp.i
+test/test_log.cpp.i:
+	$(MAKE) -f CMakeFiles/test_log.dir/build.make CMakeFiles/test_log.dir/test/test_log.cpp.i
+.PHONY : test/test_log.cpp.i
 
-test/test_thread.s: test/test_thread.cpp.s
+test/test_log.s: test/test_log.cpp.s
 
-.PHONY : test/test_thread.s
+.PHONY : test/test_log.s
 
 # target to generate assembly for a file
-test/test_thread.cpp.s:
-	$(MAKE) -f CMakeFiles/test_thread.dir/build.make CMakeFiles/test_thread.dir/test/test_thread.cpp.s
-.PHONY : test/test_thread.cpp.s
+test/test_log.cpp.s:
+	$(MAKE) -f CMakeFiles/test_log.dir/build.make CMakeFiles/test_log.dir/test/test_log.cpp.s
+.PHONY : test/test_log.cpp.s
 
 # Help Target
 help:
@@ -279,7 +279,7 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... test_thread"
+	@echo "... test_log"
 	@echo "... yecc"
 	@echo "... src/config.o"
 	@echo "... src/config.i"
@@ -293,9 +293,9 @@ help:
 	@echo "... src/util.o"
 	@echo "... src/util.i"
 	@echo "... src/util.s"
-	@echo "... test/test_thread.o"
-	@echo "... test/test_thread.i"
-	@echo "... test/test_thread.s"
+	@echo "... test/test_log.o"
+	@echo "... test/test_log.i"
+	@echo "... test/test_log.s"
 .PHONY : help
 
 

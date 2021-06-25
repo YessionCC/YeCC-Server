@@ -1,4 +1,4 @@
 /home/yession/Code/Cpp/Server/build/CMakeFiles/rebuild_cache.dir
 /home/yession/Code/Cpp/Server/build/CMakeFiles/edit_cache.dir
-/home/yession/Code/Cpp/Server/build/CMakeFiles/test_thread.dir
+/home/yession/Code/Cpp/Server/build/CMakeFiles/test_log.dir
 /home/yession/Code/Cpp/Server/build/CMakeFiles/yecc.dir

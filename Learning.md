@@ -70,3 +70,18 @@ compiler don't know whether `ConfigVar<T>::ptr ` is a type or variable because u
 - `dynamic_cast` used to cast parent class to its child class(derived)
 - `reinterpret_cast` forced to cast any type
 **To cast smart pointer, use cast func like std::dynamic_pointer_cast**
+
+## Static member
+think about such a case:
+there are two static vars, one static var will call function that define in another static var. If the static var have not inited, this will cause runtime error. So, if maybe cause this case, recommend:
+```cpp
+static ConfigVarMap& GetDatas() {
+        static ConfigVarMap s_data;
+        return s_data;
+      }
+```
+define static var in func rather than in the global, so if call func, the static var must be init.
+
+## Lock
+- spin_lock:based on CAS, busy query to test if locked, high cpu utilization but will not trap in core, suitable for thread high conflict
+- wr_lock: write and read lock, `rdlock()` will not block reader(if there's no writer)

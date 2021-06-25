@@ -1205,6 +1205,9 @@ CMakeFiles/yecc.dir/src/thread.cpp.o: ../include/thread.hpp
 CMakeFiles/yecc.dir/src/thread.cpp.o: ../include/util.hpp
 CMakeFiles/yecc.dir/src/thread.cpp.o: ../src/thread.cpp
 
+CMakeFiles/yecc.dir/src/util.cpp.o: ../include/log.hpp
+CMakeFiles/yecc.dir/src/util.cpp.o: ../include/singleton.hpp
+CMakeFiles/yecc.dir/src/util.cpp.o: ../include/thread.hpp
 CMakeFiles/yecc.dir/src/util.cpp.o: ../include/util.hpp
 CMakeFiles/yecc.dir/src/util.cpp.o: ../src/util.cpp
 
