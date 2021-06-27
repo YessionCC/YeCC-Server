@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -g -Wall -std=c++11 -pthread  -shared -Wl,-soname,libyecc.so -o ../lib/libyecc.so CMakeFiles/yecc.dir/src/config.cpp.o CMakeFiles/yecc.dir/src/log.cpp.o CMakeFiles/yecc.dir/src/thread.cpp.o CMakeFiles/yecc.dir/src/util.cpp.o 

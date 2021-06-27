@@ -1,1 +1,0 @@
-/usr/bin/c++  -Wall -std=c++11  -rdynamic CMakeFiles/test_logconf.dir/test/test_logconf.cpp.o  -o ../bin/test_logconf  -Wl,-rpath,/home/yession/Code/Cpp/Server/lib ../lib/libyecc.so /usr/local/lib/libyaml-cpp.a 
