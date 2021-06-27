@@ -165,6 +165,20 @@ use template methods will be ==convenient to parse nested structure==
 **How yaml works**
 `Config::LoadFromYaml`: from yaml to gen `key:string, val:node`, if `Config `have this key then use `ConfigVar` related to parse node(if it is Scalar)
 
+**How to format yaml to a certain data struct**
+- first, define a data type just like this:
+```cpp
+yecc::ConfigVar<int>::ptr int_val_config = 
+  yecc::Config::Lookup("system.port", (int)8080, "system port");
+```
+- then call `Config::LoadFromYaml`, this func will read yaml config file and call `lexical_cast` if the connfig's name has been defined and after that you can get the datas from file. If the name not defined in file then it will keep the default value. In the example above, if there's a file:
+```yaml
+system:
+  port: 9000
+```
+after reading, "system.port" will be 9000. If there's no file has the name, "system.port" will still be 8080.
+So we can use less config, just focus on these important values we need to config.
+
 ## Config combine Log
 use config module to conf log module
 

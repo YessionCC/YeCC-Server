@@ -54,7 +54,7 @@ void test_config() {
     YECC_LOG_INFO(YECC_ROOT_LOG)<<"before "<< d.first<<" "<<d.second;
   }
 
-  int_val_config->addListener( 1,
+  int_val_config->addListener(
     [](const int& o_v, const int& n_v){
       YECC_LOG_DEBUG(YECC_ROOT_LOG)<<"lalaal: "<<o_v<<" - "<<n_v;
   });

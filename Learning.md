@@ -9,6 +9,7 @@ std::get<2>(tuple)
 ```cpp
 class Test: std::public std::enable_shared_from_this<Test>
 //this will enable gen shared_ptr from "this" ptr
+//but will disable create instance on stack
 std::shared_from_this()
 //this will gen shared_ptr from "this" ptr
 ```
