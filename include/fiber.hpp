@@ -16,13 +16,14 @@ namespace yecc {
         HOLD,
         EXEC,
         TERM,
-        READY
+        READY,
+        EXCEP
       };
     private:
       Fiber();
 
     public:
-      Fiber(std::function<void()> cb, size_t stack_size);
+      Fiber(std::function<void()> cb, size_t stack_size = 0);
       ~Fiber();
 
       void reset(std::function<void()> cb);
@@ -31,6 +32,8 @@ namespace yecc {
       //swap cur fiber to background
       void swapOut();
 
+      uint64_t getId() const {return m_id;}
+
     public:
       static Fiber::ptr GetThis();
       static void SetThis(Fiber* f);
@@ -38,6 +41,7 @@ namespace yecc {
       static void YieldToHold();
 
       static uint64_t TotalFibers();
+      static uint64_t GetCurFiberId();
 
       static void MainFunc();
 

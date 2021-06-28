@@ -1,5 +1,6 @@
 #include"util.hpp"
 #include"log.hpp"
+#include"fiber.hpp"
 #include<execinfo.h>
 
 namespace yecc {
@@ -11,7 +12,7 @@ namespace yecc {
   }
 
   uint32_t GetFiberId() {
-    return 0;
+    return Fiber::GetCurFiberId();
   }
 
   void BackTrace(std::vector<std::string>& bt, int _size, int skip){
