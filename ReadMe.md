@@ -193,7 +193,8 @@ ConfigVar<std::set<LogDefine> >::ptr logs_define =
 ```
 `LogDefine` is just a struct that warp some info about logger
 we can use`yecc::Config::LoadFromYaml` to read logger conf and the conf will load to `LogDefine`
-then cbfunc will be called, it will transfer `LogDefine` to `Logger`, every conf change(add/modify/delete) will be detected. New logger will be add in LoggerMgr with its name and can also get it by its name with`YECC_LOG_NAME` afters
+then cbfunc will be called, it will transfer `LogDefine` to `Logger`, every conf change(add/modify/delete) will be detected. New logger will be add in LoggerMgr with its name and can also get it by its name with`YECC_LOG_NAME` afters.
+**notice**:`YECC_LOG_ROOT` will not be modified even if conf file has set a logger named 'root', because root logger was store in `m_root` in `LogManager`, not in the logname:logger map
 
 **About Log Conf**
 - appender level default is DEBUG

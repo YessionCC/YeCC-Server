@@ -1,16 +1,15 @@
 logs:
   - name: root
-    level: info
+    level: debug
     formatter: "%d%T%m%n"
     appender:
-      - type: FileLogAppender
-        file: log.txt
-        level: FATAL  #default: DEBUG
       - type: StdoutLogAppender
-        formatter: "%d{%Y-%m-%d %H:%M:%S}HHH"  #default: use logger's formatter
+        formatter: "%d{%Y-%m-%d %H:%M:%S}%Ttid: %t%Ttname: \
+      %N%Tfid: %F%T[%p]%T[%c]%T%f:%l%T%m%n"
   - name: system
     level: debug
-    formatter: "%d{%Y-%m-%d %H:%M:%S}%T%t%T%F%T[%p]%T[%c]%T%f:%l%T%m%n"
+    formatter: "%d{%Y-%m-%d %H:%M:%S}%Ttid: %t%Ttname: \
+      %N%Tfid: %F%T[%p]%T[%c]%T%f:%l%T%m%n"
     appender:
       # - type: FileLogAppender
       #   file: log.txt

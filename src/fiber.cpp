@@ -67,7 +67,6 @@ namespace yecc {
         SetThis(nullptr);
       }
     }
-    YECC_LOG_DEBUG(YECC_ROOT_LOG)<<123;
   }
 
   void Fiber::reset(std::function<void()> cb){

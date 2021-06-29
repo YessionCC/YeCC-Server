@@ -9,10 +9,11 @@ namespace yecc {
   LogEvent::LogEvent(
         std::shared_ptr<Logger> logger, LogLevel::Level level,
         const char* file, int32_t line, uint32_t elapse,
-        uint32_t threadId, uint32_t fiberId, uint64_t time)
+        uint32_t threadId, uint32_t fiberId, uint64_t time,
+        const std::string& tname)
     :m_logger(logger), m_level(level), m_file(file), 
     m_line(line), m_elapse(elapse), m_threadId(threadId),
-    m_fiberId(fiberId), m_time(time) {
+    m_fiberId(fiberId), m_time(time), m_tname(tname) {
   }
 
   void LogEvent::format(const char* fmt, ...) {
@@ -282,6 +283,16 @@ namespace yecc {
       os<<event->getThreadId();
     }
   };
+  class ThreadNameFormatItem: public LogFormatter::FormatItem {
+  public:
+    ThreadNameFormatItem(const std::string& str=""):FormatItem(str){} 
+    void format(std::ostream& os, 
+      std::shared_ptr<Logger> ptr,
+      LogLevel::Level level, 
+      LogEvent::ptr event) override {
+      os<<event->getThreadName();
+    }
+  };
   class FiberIdFormatItem: public LogFormatter::FormatItem {
   public:
     FiberIdFormatItem(const std::string& str=""):FormatItem(str){} 
@@ -400,6 +411,7 @@ namespace yecc {
       XX(r, ElapseFormatItem),
       XX(c, LogNameFormatItem),
       XX(t, ThreadIdFormatItem),
+      XX(N, ThreadNameFormatItem),
       XX(n, NewLineFormatItem),
       XX(d, DateTimeFormatItem),
       XX(f, FilenameFormatItem),
@@ -427,9 +439,10 @@ namespace yecc {
   }
 
   LoggerManager::LoggerManager() {
+    //m_root can not be modified by conf file outside.
     m_root.reset(new Logger);
     m_root->addAppender(LogAppender::ptr(new StdoutAppender));
-
+    //m_loggers["root"] = m_root;////self modified!
     init();
   }
   Logger::ptr LoggerManager::getLogger(const std::string& name) {

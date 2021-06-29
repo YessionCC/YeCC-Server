@@ -86,3 +86,40 @@ define static var in func rather than in the global, so if call func, the static
 ## Lock
 - spin_lock:based on CAS, busy query to test if locked, high cpu utilization but will not trap in core, suitable for thread high conflict
 - wr_lock: write and read lock, `rdlock()` will not block reader(if there's no writer)
+
+## Fiber
+Fiber(协程) is a lightweight way to simulate thread, it's dispatch are manipulated by progammer
+We can use ucontext(Linux only) to implement it
+Typical demo like follow:
+```cpp
+ucontext_t tofunc, tomain;
+void foo() {
+  std::cout<<"123"<<std::endl;
+  swapcontext(&tofunc, &tomain);
+  std::cout<<"789"<<std::endl;
+}
+
+void fortest() {
+  getcontext(&tofunc);
+  int sz = 1024*1024;
+  void* stack = malloc(sz);
+  tofunc.uc_link=nullptr;
+  tofunc.uc_stack.ss_sp = stack;
+  tofunc.uc_stack.ss_size = sz;
+  makecontext(&tofunc, foo, 0);
+  swapcontext(&tomain, &tofunc);
+  std::cout<<"456"<<std::endl;
+  free(stack);
+}
+```
+It will print `123\n 456\n`
+- `makecontext(&context, func)`:create a new context(PC will point to func enter, other regs not important), the context must be init by `getcontext` (though it seems that nothing deserve init, but must use it)
+- `swapcontext(&context_save, &context_swap_to)` save current context to `context_save` and enter to the `context_swap_to`, so after call the func, `context_save` will save important infos(PC, SS, SP...regs) to support reEnter this break point
+
+**notice** `swapcontext` is different from call a func or `return`. Like the demo above `std::cout<<"789"<<std::endl;` will never be exec. After swap to the `main` we `free(stack)` the memory of the fiber was cleared. So if we swapOut from a function, we need to think about whether all the ==destructor exec normally== and ==smart pointers' reference calc. correctly==
+If smart pointer encounter some problems, we might to release it manually, like follow:
+```cpp
+auto raw_ptr = cur.get();
+cur.reset();//make cur be a null smart ptr
+raw_ptr->swapOut();
+```

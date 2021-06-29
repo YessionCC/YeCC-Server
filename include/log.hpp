@@ -18,7 +18,7 @@
     yecc::LogEventWrap(yecc::LogEvent::ptr(new yecc::LogEvent( \
       logger, level, \
       __FILE__, __LINE__, 0, yecc::GetThreadId(), \
-      yecc::GetFiberId(), time(0)))).getSS()
+      yecc::GetFiberId(), time(0), yecc::Thread::GetName()))).getSS()
 
 #define YECC_LOG_DEBUG(logger) YECC_LOG_LEVEL(logger, yecc::LogLevel::DEBUG)
 #define YECC_LOG_INFO(logger) YECC_LOG_LEVEL(logger, yecc::LogLevel::INFO)
@@ -31,7 +31,8 @@
     yecc::LogEventWrap(yecc::LogEvent::ptr(new yecc::LogEvent( \
       logger, level, \
       __FILE__, __LINE__, 0, yecc::GetThreadId(), \
-      yecc::GetFiberId(), time(0)))).getEvent()->format(fmt, __VA_ARGS__)
+      yecc::GetFiberId(), time(0), yecc::Thread::GetName()))).\
+      getEvent()->format(fmt, __VA_ARGS__)
 
 #define YECC_LOG_FMT_DEBUG(logger, fmt, ...) \
   YECC_LOG_FMT_LEVEL(logger, yecc::LogLevel::DEBUG, fmt, __VA_ARGS__)
@@ -74,7 +75,8 @@ namespace yecc {
       LogEvent(
         std::shared_ptr<Logger> logger, LogLevel::Level level,
         const char* file, int32_t line, uint32_t elapse,
-        uint32_t threadId, uint32_t fiberId, uint64_t time);
+        uint32_t threadId, uint32_t fiberId, uint64_t time, 
+        const std::string& thread_name);
 
       const char* getFile() const { return m_file; }
       int32_t getLine() const { return m_line; }
@@ -82,6 +84,7 @@ namespace yecc {
       uint32_t getThreadId() const { return m_threadId; }
       uint32_t getFiberId() const { return m_fiberId; }
       uint64_t getTime() const { return m_time; }
+      const std::string& getThreadName() const { return m_tname; }
       const std::string getContent() const { return m_ss.str(); }
       std::stringstream& getSS() { return m_ss; }
 
@@ -100,6 +103,7 @@ namespace yecc {
       uint32_t m_threadId = 0;
       uint32_t m_fiberId = 0; // corontine ID
       uint64_t m_time;
+      const std::string m_tname;//thread name
       std::stringstream m_ss;
   };
 
