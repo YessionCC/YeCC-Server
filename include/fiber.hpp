@@ -1,8 +1,8 @@
 #pragma once
 
-#include<ucontext.h>
 #include<memory>
 #include<functional>
+#include<ucontext.h>
 #include"thread.hpp"
 
 namespace yecc {
@@ -15,9 +15,9 @@ namespace yecc {
         INIT,
         HOLD,
         EXEC,
-        TERM,
+        TERM, //terminate normally
         READY,
-        EXCEP
+        EXCEP //terminate with exception
       };
     private:
       Fiber();

@@ -8,8 +8,10 @@ namespace yecc {
 
   static std::atomic<uint64_t> g_fiber_id{0};
   static std::atomic<uint64_t> g_fiber_count{0};
+  //cur fiber that was exec
   static thread_local Fiber* cur_fiber = nullptr;
-  static thread_local Fiber::ptr cur_s_fiber = nullptr;
+  //always the main fiber
+  static thread_local Fiber::ptr last_s_fiber = nullptr;
 
   static auto logger = YECC_LOG_NAME("system");
 
@@ -36,19 +38,20 @@ namespace yecc {
     ++g_fiber_count;
   }
   //if set stack_size 0, stack_size will be config stack size
-  Fiber::Fiber(std::function<void()> cb, size_t stack_size):
-   m_id(++g_fiber_id),m_cb(cb){
-     ++g_fiber_count;
-     m_stack_size = stack_size? stack_size: g_fiber_stack_size->getValue();
-     m_stack = StackMallocator::Alloc(stack_size);
-     if(getcontext(& m_ctx)) {
+  Fiber::Fiber(std::function<void()> cb, size_t stack_size)
+   :m_id(++g_fiber_id),m_cb(cb){
+    
+    ++g_fiber_count;
+    m_stack_size = stack_size? stack_size: g_fiber_stack_size->getValue();
+    m_stack = StackMallocator::Alloc(m_stack_size);
+    if(getcontext(&m_ctx)) {
       YECC_ASSERT2(false, "getcontext");
-      }
-      m_ctx.uc_link = nullptr;
-      m_ctx.uc_stack.ss_sp = m_stack;
-      m_ctx.uc_stack.ss_size = m_stack_size;
+    }
+    m_ctx.uc_link = nullptr;
+    m_ctx.uc_stack.ss_sp = m_stack;
+    m_ctx.uc_stack.ss_size = m_stack_size;
 
-      makecontext(&m_ctx, Fiber::MainFunc, 0);
+    makecontext(&m_ctx, Fiber::MainFunc, 0);
   }
   Fiber::~Fiber(){
     --g_fiber_count;
@@ -59,11 +62,12 @@ namespace yecc {
     else {//main fiber(thread)
       YECC_ASSERT(!m_cb);
       YECC_ASSERT(m_state == EXEC);
-      Fiber::ptr cur = GetThis();
-      if(cur.get() == this) {
+      Fiber* cur = cur_fiber;
+      if(cur == this) {
         SetThis(nullptr);
       }
     }
+    YECC_LOG_DEBUG(YECC_ROOT_LOG)<<123;
   }
 
   void Fiber::reset(std::function<void()> cb){
@@ -86,25 +90,28 @@ namespace yecc {
     m_state = EXEC;
     SetThis(this);
 
-    if(swapcontext(&(cur_s_fiber->m_ctx), &m_ctx)) {
+    if(swapcontext(&(last_s_fiber->m_ctx), &m_ctx)) {
       YECC_ASSERT2(false, "swapcontext");
     }
   }
   //swap cur fiber to background
   void Fiber::swapOut(){
-    SetThis(cur_s_fiber.get());
-    if(swapcontext(&m_ctx, &(cur_s_fiber->m_ctx))) {
+    SetThis(last_s_fiber.get());
+    if(swapcontext(&m_ctx, &(last_s_fiber->m_ctx))) {
       YECC_ASSERT2(false, "swapcontext");
     }
   }
-
+  /*
+  if in main fiber(thread), then create main fiber and set and return
+  if in a certain fiber, return the fiber
+  */
   Fiber::ptr Fiber::GetThis(){
     if(cur_fiber) {
       return cur_fiber->shared_from_this();
     }
     Fiber::ptr fiber(new Fiber);
     YECC_ASSERT(fiber.get() == cur_fiber)
-    cur_s_fiber = fiber;
+    last_s_fiber = fiber;
     return cur_fiber->shared_from_this();
   }
   void Fiber::SetThis(Fiber* f){
@@ -145,5 +152,10 @@ namespace yecc {
       cur->m_state = EXCEP;
       YECC_LOG_ERROR(logger)<<"fiber exception";
     }
+    auto raw_ptr = cur.get();
+    cur.reset();
+    //notice that swapout != return, this will not call destructors
+    //we need to handle destruct carefully
+    raw_ptr->swapOut();
   }
 }
